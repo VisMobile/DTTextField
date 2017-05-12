@@ -16,7 +16,7 @@ public extension String {
     }
 }
 
-public class DTTextField: UITextField {
+open class DTTextField: UITextField {
     
     public enum FloatingDisplayStatus{
         case always
@@ -130,18 +130,18 @@ public class DTTextField: UITextField {
         }
     }
     
-    override public var borderStyle: UITextBorderStyle{
+    override open var borderStyle: UITextBorderStyle{
         didSet{
             guard borderStyle != oldValue else { return }
             borderStyle = .none
         }
     }
     
-    public override var text: String?{
+    open override var text: String?{
         didSet{ self.textFieldTextChanged() }
     }
     
-    override public var placeholder: String?{
+    override open var placeholder: String?{
         didSet{
             
             guard let color = placeholderColor else {
@@ -153,7 +153,7 @@ public class DTTextField: UITextField {
         }
     }
     
-    override public var attributedPlaceholder: NSAttributedString?{
+    override open var attributedPlaceholder: NSAttributedString?{
         didSet{ lblFloatPlaceholder.text = placeholderFinal }
     }
     
@@ -307,7 +307,7 @@ public class DTTextField: UITextField {
         showErrorLabel = false
     }
     
-    override public var intrinsicContentSize: CGSize{
+    override open var intrinsicContentSize: CGSize{
         self.layoutIfNeeded()
         
         let textFieldIntrinsicContentSize = super.intrinsicContentSize
@@ -324,12 +324,12 @@ public class DTTextField: UITextField {
         }
     }
     
-    override public func textRect(forBounds bounds: CGRect) -> CGRect {
+    override open func textRect(forBounds bounds: CGRect) -> CGRect {
         let rect = super.textRect(forBounds: bounds)
         return insetRectForBounds(rect: rect)
     }
     
-    override public func editingRect(forBounds bounds: CGRect) -> CGRect {
+    override open func editingRect(forBounds bounds: CGRect) -> CGRect {
         let rect = super.editingRect(forBounds: bounds)
         return insetRectForBounds(rect: rect)
     }
@@ -341,23 +341,23 @@ public class DTTextField: UITextField {
         return rect
     }
     
-    override public func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+    override open func leftViewRect(forBounds bounds: CGRect) -> CGRect {
         let rect = super.leftViewRect(forBounds: bounds)
         return insetForSideView(forBounds: rect)
     }
     
-    override public func rightViewRect(forBounds bounds: CGRect) -> CGRect {
+    override open func rightViewRect(forBounds bounds: CGRect) -> CGRect {
         let rect = super.rightViewRect(forBounds: bounds)
         return insetForSideView(forBounds: rect)
     }
     
-    override public func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
+    override open func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
         var rect = super.clearButtonRect(forBounds: bounds)
         rect.origin.y = (dtLayerHeight - rect.size.height) / 2
         return rect
     }
     
-    override public func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         
         CATransaction.begin()
