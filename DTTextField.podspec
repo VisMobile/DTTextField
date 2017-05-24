@@ -23,7 +23,8 @@ s.source           = { :git => 'https://github.com/iDhaval/DTTextField.git', :ta
 
 s.ios.deployment_target = '9.0'
 
-s.source_files = 'DTTextField/**/*.{swift,png,json}'
+s.source_files = 'DTTextField/*.{swift}'
+s.resources = "DTTextField/Assets/*.xcassets"
 s.frameworks = 'UIKit'
 
 end
