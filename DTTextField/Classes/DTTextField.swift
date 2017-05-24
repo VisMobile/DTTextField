@@ -17,7 +17,7 @@ public extension String {
 }
 
 open class DTTextField: UITextField {
-    
+	
     public enum FloatingDisplayStatus{
         case always
         case never
@@ -36,7 +36,10 @@ open class DTTextField: UITextField {
     public var floatPlaceholderActiveColor:UIColor          = UIColor.black
     public var floatingLabelShowAnimationDuration           = 0.3
     public var floatingDisplayStatus:FloatingDisplayStatus  = .defaults
-    
+	
+	fileprivate var secureDisplayButton: UIButton? = nil
+	fileprivate var isSecure : Bool = false;
+	
     public var errorMessage:String = ""{
         didSet{ lblError.text = errorMessage }
     }
@@ -67,7 +70,7 @@ open class DTTextField: UITextField {
     public var canShowBorder:Bool = true{
         didSet{ dtLayer.isHidden = !canShowBorder }
     }
-    
+	
     public var placeholderColor:UIColor?{
         didSet{
             guard let color = placeholderColor else { return }
@@ -197,12 +200,21 @@ open class DTTextField: UITextField {
         lblError.textColor          = UIColor.red
         lblError.numberOfLines      = 0
         lblError.isHidden           = true
-        
+		
+		
         addTarget(self, action: #selector(textFieldTextChanged), for: .editingChanged)
-        
+		addTarget(self, action: #selector(textFieldDidEnd), for: .editingDidEnd);
+		
         addSubview(lblError)
         
         layer.insertSublayer(dtLayer, at: 0)
+		
+		// if this is a password field
+		isSecure = super.isSecureTextEntry;
+		if (isSecure) {
+			super.clearButtonMode = .never;
+			addPasswordToggle(isFirstResponder);
+		}
     }
     
     fileprivate func showErrorMessage(){
@@ -269,11 +281,34 @@ open class DTTextField: UITextField {
             animations()
         }
     }
-    
+	
+	fileprivate func addPasswordToggle(_ animated:Bool)
+	{
+		let toggleFrame = CGRect(x: 0, y: 0, width: 32, height: frame.height)
+		let toggleView : UIView = UIView(frame: toggleFrame);
+		secureDisplayButton = UIButton(frame: CGRect(x: 0.0, y: 7.0, width: toggleFrame.width, height: toggleFrame.height));
+		if let secureDisplayButton = secureDisplayButton {
+			secureDisplayButton.setImage(UIImage(named: "eyeClosed")!, for: .normal);
+			secureDisplayButton.setImage(UIImage(named: "eyeOpen")!, for: .selected);
+			secureDisplayButton.addTarget(self, action: #selector(secureDisplayButtonPressed), for: .touchUpInside)
+			toggleView.addSubview(secureDisplayButton);
+		
+			self.rightView = toggleView;
+			self.rightViewMode = .whileEditing;
+		}
+	}
+	
+	@objc fileprivate func secureDisplayButtonPressed(_ sender: AnyObject) {
+		if let secureDisplayButton = secureDisplayButton {
+			secureDisplayButton.isSelected = !secureDisplayButton.isSelected
+			self.isSecureTextEntry = !secureDisplayButton.isSelected;
+		}
+	}
+	
     fileprivate func insetRectForEmptyBounds(rect:CGRect) -> CGRect{
-        
+		
         guard showErrorLabel else { return CGRect(x: x, y: 0, width: rect.width - paddingX, height: rect.height) }
-        
+		
         let topInset = (rect.size.height - lblError.bounds.size.height - paddingYErrorLabel - fontHeight) / 2.0
         let textY = topInset - ((rect.height - fontHeight) / 2.0)
         
@@ -306,6 +341,15 @@ open class DTTextField: UITextField {
         guard hideErrorWhenEditing && showErrorLabel else { return }
         showErrorLabel = false
     }
+	
+	@objc fileprivate func textFieldDidEnd() {
+		if (isSecure) {
+			self.isSecureTextEntry = true;
+			if let secureDisplayButton = secureDisplayButton {
+				secureDisplayButton.isSelected = false;
+			}
+		}
+	}
     
     override open var intrinsicContentSize: CGSize{
         self.layoutIfNeeded()
